@@ -1,5 +1,7 @@
 fastapi
 uvicorn
 sqlmodel
-passlib[bcrypt]
 python-jose
+pwdlib[argon2]
+pytest
+httpx

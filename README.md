@@ -1,48 +1,88 @@
-EVE Healthcare - Demo Backend
+# EVE Healthcare - Demo Backend
 
-Minimal FastAPI backend for diagnostic test bookings with simulated payments.
+A simple FastAPI backend for diagnostic test bookings with JWT authentication and simulated payments.
 
-Run locally:
+## Run Locally
 
-1. Create virtualenv and install:
+Create and activate a virtual environment:
 
 ```bash
 python -m venv .venv
 .\.venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-2. Start server:
+Start the server:
 
 ```bash
 uvicorn main:app --reload
-
-Run with Docker:
-
 ```
+
+API documentation is available at:
+
+`http://127.0.0.1:8000/docs`
+
+## Run with Docker
+
+```bash
 docker build -t eve-healthcare:local .
-docker run -p 8000:8000 -e DATABASE_URL="sqlite:///./dev.db" eve-healthcare:local
+docker run -p 8000:8000 eve-healthcare:local
 ```
 
-Or using docker-compose:
+Or:
 
-```
+```bash
 docker-compose up --build
 ```
+
+## Main APIs
+
+* `POST /auth/signup` - Create a user
+* `POST /auth/login` - Login and get JWT token
+* `POST /centres/` - Create a diagnostic centre
+* `GET /centres/` - List diagnostic centres
+* `POST /centres/{id}/tests` - Add a test to a centre
+* `GET /tests/` - List available tests
+* `POST /bookings/` - Create a booking
+* `GET /bookings/` - View your bookings
+* `GET /bookings/{id}` - View a booking
+* `DELETE /bookings/{id}` - Cancel a booking
+* `POST /payments/` - Simulate a payment
+* `POST /payments/webhook/` - Receive payment updates
+
+## Booking Flow
+
+User signup → Login → Select centre and test → Create booking → Payment → Booking confirmed or failed.
+
+Bookings start with `PENDING` status. Successful payments change them to `CONFIRMED`, while failed payments change them to `FAILED`.
+
+## Database
+
+SQLite is used by default for easy local setup. PostgreSQL can be used by setting the `DATABASE_URL` environment variable.
+
+## Tests
+
+Run the tests using:
+
+```bash
+pytest tests.py -v
 ```
 
-API highlights:
-- `POST /auth/signup` - create user
-- `POST /auth/login` - obtain JWT (use OAuth2 password)
-- `POST /centres/` - create centre
-- `POST /centres/{id}/tests` - add test to centre
-- `GET /tests/` - list tests
-- `POST /bookings/` - create booking (authenticated)
-- `POST /payments/` - simulate payment
-- `POST /payments/webhook/` - idempotent webhook
+The tests cover authentication, booking creation, payments, invalid bookings, and duplicate webhook events.
 
-Database: default sqlite `dev.db` in workspace. Set `DATABASE_URL` to use Postgres.
+## Assumptions
 
-Notes and assumptions:
-- Simple JWT secret in `auth.py` (for demo only)
-- Webhook idempotency is by `event_id` stored on `Payment.event_id`
+* Payments are simulated and no real payment gateway is used.
+* JWT authentication is used for protected APIs.
+* Users can only access and modify their own bookings.
+* Webhook events use a unique `event_id` to prevent duplicate processing.
+* Basic validation and authorization checks are included.
+
+## Future Improvements
+
+With more time, I would add database migrations, stronger secret management, structured logging, rate limiting, and more integration tests.
