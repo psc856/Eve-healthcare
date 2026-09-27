@@ -27,18 +27,6 @@ API documentation is available at:
 
 `http://127.0.0.1:8000/docs`
 
-## Run with Docker
-
-```bash
-docker build -t eve-healthcare:local .
-docker run -p 8000:8000 eve-healthcare:local
-```
-
-Or:
-
-```bash
-docker-compose up --build
-```
 
 ## Main APIs
 
